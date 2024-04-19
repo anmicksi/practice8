@@ -1,16 +1,22 @@
 package com.example.practice8.DATA.DataSources;
 import android.content.Context;
 import androidx.lifecycle.LiveData;
+import androidx.room.Room;
 import com.example.practice8.DATA.DataSources.Files.AppSpecificDataSources;
 import com.example.practice8.DATA.DataSources.Files.CommonFileDataSources;
+import com.example.practice8.DATA.DataSources.Room.AppDatabase;
+import com.example.practice8.DATA.DataSources.Room.DAO.ListDAO;
+import com.example.practice8.DATA.DataSources.Room.Entities.Category;
 import com.example.practice8.DATA.DataSources.SharedPreferences.SharedPreferencesDS;
 import com.example.practice8.DATA.Model.DataListRecycler;
 import java.util.List;
+import java.util.Map;
 
 public class Repository {
     private AppSpecificDataSources appSpecificDataSources;
     private CommonFileDataSources commonFileDataSources;
     private SharedPreferencesDS LocalDS;
+    private AppDatabase database;
     public Repository() {}
     public Repository(Context context, String appSpecificDSFileName, String commonFDSFileName) {
         this.appSpecificDataSources = new AppSpecificDataSources(context, appSpecificDSFileName);
@@ -51,5 +57,23 @@ public class Repository {
     public DataListRecycler getItem() {
         if (LocalDS == null) return null;
         else return new DataListRecycler(LocalDS.getString("Name"), LocalDS.getInt("Img"));
+    }
+    public void createDatabase(Context context, Map<String, Integer> values) {
+        if (database != null) return;
+        database = Room.databaseBuilder(context, AppDatabase.class, "List")
+                .allowMainThreadQueries().build();
+        ListDAO listDAO = database.listDAO();
+        for (Map.Entry<String, Integer> entry : values.entrySet()) {
+            insertCategory(entry.getKey(), entry.getValue());
+        }
+    }
+    public Category getCategory(String itemName) {
+        return database.listDAO().getCategoryByName(itemName);
+    }
+    public void insertCategory(String itemName, int img) {
+        Category cathegory= new Category();
+        cathegory.itemsName = itemName;
+        cathegory.img = img;
+        database.listDAO().insertCategory(cathegory);
     }
 }

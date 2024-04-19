@@ -17,17 +17,18 @@ import java.util.ArrayList;
 public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder>{
     private final static String TAG = "NewTag123";
     private final LayoutInflater inflater;
+    private static Context parent;
     private final ArrayList<DataListRecycler> items;
     public MyRecyclerAdapter(Context context, ArrayList<DataListRecycler> items) {
         this.items = items;
         this.inflater = LayoutInflater.from(context);
+        this.parent = context;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_list, parent, false);
+        View view = inflater.inflate(R.layout.item_list, parent, false);
         return new ViewHolder(view);
     }
 
